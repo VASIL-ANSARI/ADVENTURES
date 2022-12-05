@@ -61,7 +61,7 @@ function addCityToDOM(id, city, description, image) {
   paraElement.style.position="absolute";
   paraElement.style.bottom="0px";
   paraElement.style.left="0px";
-  paraElementcd ~/workspace/vasilansari150-ME_QTRIPDYNAMIC.style.marginLeft="20px";
+  paraElement.style.marginLeft="20px";
 
   div2.append(aElement);
   div2.append(h1Element);
