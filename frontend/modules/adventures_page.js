@@ -74,7 +74,7 @@ function helper(category, cost, curr, duration, id, name, img) {
   imgElement.style.width = "100%";
 
   const aElement = document.createElement("a");
-  aElement.href = `/detail/?adventure=${id}`;
+  aElement.href = `detail/?adventure=${id}`;
   aElement.id=id;
   aElement.append(imgElement);
   const divInner1 = document.createElement("div");
