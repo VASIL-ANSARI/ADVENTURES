@@ -1,14 +1,12 @@
 import config from "../conf/index.js";
 let endPointURl = config.backendEndpoint + "/adventures/detail?adventure=";
+let reservationEndpointURL = config.backendEndpoint + "/reservations/new";
 //Implementation to extract adventure ID from query params
 function getAdventureIdFromURL(search) {
   // TODO: MODULE_ADVENTURE_DETAILS
   // 1. Get the Adventure Id from the URL
   console.log(search);
   return search.split("=")[1];
-
-  // Place holder for functionality to work in the Stubs
-  return null;
 }
 //Implementation of fetch call with a paramterized input based on adventure ID
 async function fetchAdventureDetails(adventureId) {
@@ -85,7 +83,9 @@ function addBootstrapPhotoGallery(images) {
   for (let i = 0; i < images.length; i++) {
     let classNaming = "";
     if (i === 0) classNaming = "active";
-    const btnHTML = ` <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to=${i} class=${classNaming} aria-current="true" aria-label="Slide ${i+1}"></button>
+    const btnHTML = ` <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to=${i} class=${classNaming} aria-current="true" aria-label="Slide ${
+      i + 1
+    }"></button>
     `;
     divInner1 += btnHTML;
     const imgHTML = `
@@ -93,7 +93,6 @@ function addBootstrapPhotoGallery(images) {
       <img src=${images[i]} class="d-block w-100" alt="..." style = "height:500px;">
     </div>`;
     divInner2 += imgHTML;
-
   }
 
   divOuter.innerHTML = `
@@ -115,12 +114,28 @@ function addBootstrapPhotoGallery(images) {
 function conditionalRenderingOfReservationPanel(adventure) {
   // TODO: MODULE_RESERVATIONS
   // 1. If the adventure is already reserved, display the sold-out message.
+  const divSoldOut = document.getElementById("reservation-panel-sold-out");
+  const divAvailable = document.getElementById("reservation-panel-available");
+  const divPricePerHead = document.getElementById("reservation-person-cost");
+  if (adventure.available) {
+    divSoldOut.style.display = "none";
+    divAvailable.style.display = "block";
+    divPricePerHead.innerHTML = adventure.costPerHead;
+  } else {
+    divAvailable.style.display = "none";
+    divSoldOut.style.display = "block";
+  }
 }
 
 //Implementation of reservation cost calculation based on persons
 function calculateReservationCostAndUpdateDOM(adventure, persons) {
   // TODO: MODULE_RESERVATIONS
   // 1. Calculate the cost based on number of persons and update the reservation-cost field
+  const divTotalPrice = document.getElementById("reservation-cost");
+  if (persons === "") {
+    persons = 0;
+  }
+  divTotalPrice.innerHTML = adventure.costPerHead * persons;
 }
 
 //Implementation of reservation form submission
@@ -128,12 +143,50 @@ function captureFormSubmit(adventure) {
   // TODO: MODULE_RESERVATIONS
   // 1. Capture the query details and make a POST API call using fetch() to make the reservation
   // 2. If the reservation is successful, show an alert with "Success!" and refresh the page. If the reservation fails, just show an alert with "Failed!".
+  document.forms["myForm"].addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const formInputs = document.getElementsByClassName("form-control");
+   // console.log(formInputs);
+    const obj = {
+      name: formInputs.name.value,
+      date: formInputs.date.value,
+      person: formInputs.person.value,
+      adventure: adventure.id,
+    };
+    console.log(obj);
+    try{
+      const resp = await fetch(reservationEndpointURL, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(obj),
+      });
+      if(resp.ok){
+        alert("Success!");
+      }
+      else{
+        alert("Failed!");
+      }
+    }
+    catch(err){
+      alert("Failed!");
+    }
+    
+  });
 }
 
 //Implementation of success banner after reservation
 function showBannerIfAlreadyReserved(adventure) {
   // TODO: MODULE_RESERVATIONS
   // 1. If user has already reserved this adventure, show the reserved-banner, else don't
+  const divContainer = document.getElementById("reserved-banner");
+  if (adventure.reserved) {
+    divContainer.style.display = "block";
+  } else {
+    divContainer.style.display = "none";
+  }
 }
 
 export {
